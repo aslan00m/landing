@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ديارنا الحديثة - تأجير وبيع معدات ثقيلة</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a2b48',
+                        accent: '#ffcc00',
+                        'background-light': '#f8f9fc',
+                        'background-dark': '#101622',
+                    },
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                        display: ['Cairo', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8f9fc;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react,typescript">
+        // show any errors directly in the page for debugging
+        window.onerror = function(message, source, lineno, colno, error) {
+          document.body.innerHTML = `<pre style="color:red;padding:20px;">Error: ${message}\n at ${lineno}:${colno}${error ? '\n\n' + error.stack : ''}</pre>`;
+          return true; // prevent further logging
+        };
+    const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        
+
+
+
+
+function ImageGallery({ images, title, badge }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const openGallery = (index) => {
+    setCurrentIndex(index);
+    setIsOpen(true);
+  };
+
+  const closeGallery = () => {
+    setIsOpen(false);
+  };
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prevImage = (e) => {
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  return (
+    <>
+      {/* Main Image Slider */}
+      <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden group">
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={currentIndex}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            src={images[currentIndex]}
+            alt={`${title} ${currentIndex + 1}`}
+            className="w-full h-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-500"
+            onClick={() => openGallery(currentIndex)}
+          />
+        </AnimatePresence>
+
+        <div className="absolute top-4 right-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full z-10">
+          {badge}
+        </div>
+
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              <span className="material-symbols-outlined text-xl">chevron_left</span>
+            </button>
+            <button
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            >
+              <span className="material-symbols-outlined text-xl">chevron_right</span>
+            </button>
+
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIndex(idx);
+                  }}
+                  className={`h-1.5 rounded-full transition-all ${idx === currentIndex ? 'bg-white w-4' : 'bg-white/50 w-1.5 hover:bg-white/80'}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Fullscreen Modal */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center p-4 md:p-8"
+            onClick={closeGallery}
+          >
+            <button 
+              className="absolute top-4 right-4 z-20 text-white p-3 bg-black/20 hover:bg-white/10 rounded-full transition-colors backdrop-blur-sm"
+              onClick={closeGallery}
+            >
+              <span className="material-symbols-outlined text-2xl md:text-3xl">close</span>
+            </button>
+
+            <div className="relative w-full h-full flex items-center justify-center">
+              <button 
+                className="absolute left-2 md:left-4 z-10 text-white p-2 md:p-3 bg-black/20 hover:bg-white/10 rounded-full transition-colors backdrop-blur-sm"
+                onClick={prevImage}
+              >
+                <span className="material-symbols-outlined text-3xl md:text-4xl">chevron_left</span>
+              </button>
+              
+              <motion.img 
+                key={currentIndex}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                src={images[currentIndex]} 
+                alt={`${title} ${currentIndex + 1}`} 
+                className="max-w-full max-h-[70vh] md:max-h-[85vh] object-contain rounded-lg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              />
+
+              <button 
+                className="absolute right-2 md:right-4 z-10 text-white p-2 md:p-3 bg-black/20 hover:bg-white/10 rounded-full transition-colors backdrop-blur-sm"
+                onClick={nextImage}
+              >
+                <span className="material-symbols-outlined text-3xl md:text-4xl">chevron_right</span>
+              </button>
+            </div>
+
+            <div className="absolute bottom-6 md:bottom-8 left-0 right-0 flex justify-center gap-2 overflow-x-auto p-2 px-12">
+              {images.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentIndex(idx);
+                  }}
+                  className={`h-2 rounded-full transition-all flex-shrink-0 ${idx === currentIndex ? 'bg-white w-6 md:w-8' : 'bg-white/40 w-2 hover:bg-white/60'}`}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+}
+
+
+        /**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+
+
+
+
+function App() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [language, setLanguage] = useState('ar');
+
+  const translations = {
+    ar: {
+      home: 'الرئيسية',
+      equipment: 'المعدات',
+      services: 'خدماتنا',
+      projects: 'مشاريعنا',
+      contact: 'اتصل بنا',
+      requestQuote: 'اطلب عرض سعر',
+      companyName: 'ديارنا الحديثة',
+      tagline: 'تأجير وبيع معدات ثقيلة',
+      heroSubtag: 'الخيار الأول في المملكة 🇸🇦',
+      heroTitle: 'تأجير وبيع سيزر لفت ورافعات شوكية بأفضل الأسعار',
+      heroDescription: 'معدات حديثة | فحص دوري شامل | توصيل سريع للرياض، جدة، الدمام وجميع المدن',
+      callNow: 'اتصل الآن',
+      whatsapp: 'واتساب',
+      projects500: '+500',
+      projects500Text: 'مشروع مكتمل',
+      support24: '24/7',
+      supportText: 'دعم فني',
+      guarantee100: '100%',
+      guaranteeText: 'ضمان الجودة',
+      cities13: '13',
+      citiesText: 'مدينة مغطاة',
+      ourFleet: 'أسطولنا',
+      availableEquipment: 'المعدات المتاحة للتأجير والبيع',
+      viewAll: 'عرض جميع المعدات',
+      scissorLiftName: 'سيزر لفت كهربائي (Genie)',
+      scissorLiftDesc: 'مثالي للأعمال الداخلية والمستودعات والأرضيات المستوية.',
+      forkliftName: 'رافعات شوكية (Forklifts)',
+      forkliftDesc: 'متوفرة بجميع الأحجام للتخزين والتحميل والتنزيل.',
+      manLiftName: 'مان لفت',
+      manLiftDesc: 'متوفرة بمقاسات مختلفة لأعمال الرفع في الأماكن الضيقة.',
+      craneName: 'كرين',
+      craneDesc: 'كراكات متعددة الأحجام للرفع الثقيل في المواقع.',
+      wheelLoaderName: 'شـيــول',
+      wheelLoaderDesc: 'شيولات بضغاط لاستخدامات البناء والتسوية.',
+      backhoeLoaderName: 'بوكلين',
+      backhoeLoaderDesc: 'معدات 2 في 1 للحفر والتحميل.',
+      compactorName: 'رصـاصــة',
+      compactorDesc: 'آلات الدك والضغط للأرضيات.',
+      bobcatName: 'بوبـكـــات',
+      bobcatDesc: 'آلات صغيرة متعددة الاستخدامات للمواقع الضيقة.',
+      telehandlerName: 'رافعة تلسكوبية لودر',
+      telehandlerDesc: 'تلدرز متعددة الوظائف للرفع والنقل على ارتفاعات مختلفة.',
+      requestPrice: 'اطلب السعر',
+      whyChooseUs: 'لماذا تختارنا',
+      whyChooseDesc: 'نقدم حلول رفع ومناولة متكاملة تضمن استمرارية عملك بكفاءة عالية',
+      modernEquipment: 'معدات حديثة ومفحوصة',
+      modernDesc: 'جميع معداتنا تخضع لفحص دوري صارم لضمان أعلى معايير السلامة والكفاءة في الموقع.',
+      competitivePrices: 'أسعار تنافسية',
+      pricesDesc: 'نقدم أفضل خطط الأسعار للإيجار الشهري، وعروض خاصة للمشاريع الكبيرة.',
+      fastDelivery: 'توصيل سريع',
+      deliveryDesc: 'أسطول نقل خاص لتوصيل المعدات لمواقع العمل في جميع أنحاء المملكة خلال 24 ساعة.',
+      technicalSupport: 'دعم فني مستمر',
+      supportDesc: 'فريق صيانة متنقل جاهز للتدخل السريع وإصلاح أي أعطال طارئة في موقع العمل.',
+      useCases: 'استخدامات متعددة لمختلف القطاعات',
+      useCasesDesc: 'نحن شركاء النجاح لمختلف القطاعات الصناعية والإنشائية في المملكة، نوفر المعدات المناسبة لكل بيئة عمل.',
+      construction: 'قطاع الإنشاءات والمقاولات',
+      constructionDesc: 'تركيبات الواجهات، الأعمال الكهربائية، وأنظمة التكييف.',
+      warehouses: 'المستودعات والخدمات اللوجستية',
+      warehousesDesc: 'تنظيم البضائع، الجرد السنوي، وترتيب الرفوف العالية.',
+      factories: 'المصانع والصيانة',
+      factoriesDesc: 'صيانة خطوط الإنتاج، وتركيب الإضاءة والأنظمة الأمنية.',
+      startProject: 'ابدأ مشروعك معنا',
+      rentalServices: 'تأجير المعدات',
+      rentalSubtitle: 'حلول مرنة للمشاريع المؤقتة',
+      rentalBenefit1: 'فقط للايجار الشهري',
+      rentalBenefit2: 'شامل الصيانة وقطع الغيار',
+      rentalBenefit3: 'استبدال فوري في حال الأعطال',
+      rentalBenefit4: 'توصيل للموقع واستلام بعد الانتهاء',
+      bookNow: 'احجز الآن',
+      salesServices: 'بيع جديد ومستعمل',
+      salesSubtitle: 'تملك أصولك الخاصة بأفضل الأسعار',
+      salesBenefit1: 'معدات جديدة (وكالة) بضمان المصنع',
+      salesBenefit2: 'معدات مستعملة نظيفة ومفحوصة',
+      salesBenefit3: 'أسعار تنافسية وخيارات دفع',
+      salesBenefit4: 'خدمات ما بعد البيع وعقود صيانة',
+      contactSales: 'تواصل للمبيعات',
+      coverage: 'التغطية الأصلية في الرياض وغيرها',
+      mainCenter: 'المركز الرئيسي',
+      westBranch: 'فرع الغربية',
+      eastBranch: 'فرع الشرقية',
+      comingSoon: 'قريباً',
+      testimonials: 'آراء عملائنا',
+      testimonial1: '"تعاملنا معهم في مشروع توسعة المستودعات، كانت المعدات نظيفة جداً ووصلت في الموعد المحدد. فريق الصيانة متجاوب جداً."',
+      testimonialAuthor1: 'محمد العنزي',
+      testimonialRole1: 'مدير مشروع - شركة إنشاءات',
+      testimonial2: '"أسعارهم ممتازة مقارنة بالسوق، وتنوع المعدات عندهم كبير. استأجرنا 3 رافعات شوكية وكان الأداء فوق المتوقع."',
+      testimonialAuthor2: 'عبدالله السالم',
+      testimonialRole2: 'مسؤول لوجستي',
+      testimonial3: '"خدمة العملاء محترفة وسريعة. اشتريت سيزر لفت كهربائي مستعمل منهم وكان بحالة الوكالة."',
+      testimonialAuthor3: 'فهد القحطاني',
+      testimonialRole3: 'مقاول كهرباء',
+      footerDescription: 'شريكك الموثوق لتأجير وبيع معدات الرفع والمناولة في المملكة العربية السعودية. جودة، سلامة، والتزام بالمواعيد.',
+      contactInfo: 'معلومات التواصل',
+      workingHours: 'ساعات العمل',
+      address: 'الرياض، طريق الخرج، المدينة الصناعية الثانية',
+      allWeek: 'على مدار الأسبوع',
+      hours24: '24 ساعة',
+      footerCopyright: '© 2023 شركة ديارنا الحديثة. جميع الحقوق محفوظة.',
+      rentSale: 'تأجير / بيع',
+      fullServices: 'خدمات متكاملة تناسب ميزانيتك',
+      fullServicesDesc: 'سواء كنت تحتاج المعدات لفترة قصيرة أو ترغب في التملك، لدينا الحل.',
+      talkWithUs: 'تحدث معنا',
+    },
+    en: {
+      home: 'Home',
+      equipment: 'Equipment',
+      services: 'Services',
+      projects: 'Projects',
+      contact: 'Contact',
+      requestQuote: 'Request Quote',
+      companyName: 'Al-Diyarna Modern',
+      tagline: 'Heavy Equipment Rental & Sales',
+      heroSubtag: 'Top Choice in the Kingdom 🇸🇦',
+      heroTitle: 'Scissor Lifts and Forklifts Rental & Sales at Best Prices',
+      heroDescription: 'Modern Equipment | Comprehensive Maintenance | Fast Delivery to Riyadh, Jeddah, Dammam & All Cities',
+      callNow: 'Call Now',
+      whatsapp: 'WhatsApp',
+      projects500: '+500',
+      projects500Text: 'Completed Projects',
+      support24: '24/7',
+      supportText: 'Technical Support',
+      guarantee100: '100%',
+      guaranteeText: 'Quality Guarantee',
+      cities13: '13',
+      citiesText: 'Cities Covered',
+      ourFleet: 'Our Fleet',
+      availableEquipment: 'Available Equipment for Rental and Sale',
+      viewAll: 'View All Equipment',
+      scissorLiftName: 'Electric Scissor Lift (Genie)',
+      scissorLiftDesc: 'Perfect for indoor work, warehouses, and flat surfaces.',
+      forkliftName: 'Forklifts',
+      forkliftDesc: 'Available in all sizes for storage, loading, and unloading.',
+      manLiftName: 'Man Lift',
+      manLiftDesc: 'Available in different sizes for lifting work in tight spaces.',
+      craneName: 'Crane',
+      craneDesc: 'Multi-size cranes for heavy lifting at job sites.',
+      wheelLoaderName: 'Wheel Loader',
+      wheelLoaderDesc: 'Wheel loaders for construction and grading applications.',
+      backhoeLoaderName: 'Backhoe Loader',
+      backhoeLoaderDesc: '2-in-1 equipment for digging and loading.',
+      compactorName: 'Compactor',
+      compactorDesc: 'Compaction equipment for floor work.',
+      bobcatName: 'Bobcat',
+      bobcatDesc: 'Small versatile machines for tight job sites.',
+      telehandlerName: 'Telehandler Loader',
+      telehandlerDesc: 'Multi-function telehandlers for lifting and transport at various heights.',
+      requestPrice: 'Request Price',
+      whyChooseUs: 'Why Choose Us',
+      whyChooseDesc: 'We offer integrated lifting and handling solutions ensuring continuous operation with high efficiency',
+      modernEquipment: 'Modern & Inspected Equipment',
+      modernDesc: 'All our equipment undergoes strict periodic inspections to ensure the highest safety and efficiency standards on site.',
+      competitivePrices: 'Competitive Prices',
+      pricesDesc: 'We offer the best rental plans and special offers for large projects.',
+      fastDelivery: 'Fast Delivery',
+      deliveryDesc: 'Our own transport fleet delivers equipment to job sites across the kingdom within 24 hours.',
+      technicalSupport: 'Continuous Technical Support',
+      supportDesc: 'Our mobile maintenance team is ready for quick response and emergency repairs on site.',
+      useCases: 'Multiple Applications for Various Sectors',
+      useCasesDesc: 'We are successful partners for various industrial and construction sectors in the kingdom, providing appropriate equipment for every work environment.',
+      construction: 'Construction and Contracting Sector',
+      constructionDesc: 'Facade installations, electrical work, and HVAC systems.',
+      warehouses: 'Warehouses and Logistics Services',
+      warehousesDesc: 'Goods organization, annual inventory, and high shelf arrangement.',
+      factories: 'Factories and Maintenance',
+      factoriesDesc: 'Production line maintenance and installation of lighting and security systems.',
+      startProject: 'Start Your Project With Us',
+      rentalServices: 'Equipment Rental',
+      rentalSubtitle: 'Flexible solutions for temporary projects',
+      rentalBenefit1: 'Monthly rental only',
+      rentalBenefit2: 'Includes maintenance and spare parts',
+      rentalBenefit3: 'Immediate replacement in case of breakdown',
+      rentalBenefit4: 'Delivery to site and pickup after completion',
+      bookNow: 'Book Now',
+      salesServices: 'New and Used Sales',
+      salesSubtitle: 'Own your own assets at the best prices',
+      salesBenefit1: 'New equipment (agency) with manufacturer warranty',
+      salesBenefit2: 'Clean and inspected used equipment',
+      salesBenefit3: 'Competitive prices and payment options',
+      salesBenefit4: 'After-sales services and maintenance contracts',
+      contactSales: 'Contact Sales',
+      coverage: 'Coverage Across Riyadh and Beyond',
+      mainCenter: 'Main Center',
+      westBranch: 'Western Branch',
+      eastBranch: 'Eastern Branch',
+      comingSoon: 'Coming Soon',
+      testimonials: 'Our Clients\' Reviews',
+      testimonial1: '"We dealt with them on a warehouse expansion project. The equipment was very clean and arrived on schedule. The maintenance team is very responsive."',
+      testimonialAuthor1: 'Mohammed Al-Enezi',
+      testimonialRole1: 'Project Manager - Construction Company',
+      testimonial2: '"Their prices are excellent compared to the market, and they have a wide variety of equipment. We rented 3 forklifts and the performance was above expectations."',
+      testimonialAuthor2: 'Abdullah Al-Salem',
+      testimonialRole2: 'Logistics Manager',
+      testimonial3: '"Customer service is professional and fast. I bought a used electric scissor lift from them and it was in dealer condition."',
+      testimonialAuthor3: 'Fahd Al-Qahtani',
+      testimonialRole3: 'Electrical Contractor',
+      footerDescription: 'Your trusted partner for lifting and material handling equipment rental and sales in the Kingdom of Saudi Arabia. Quality, Safety, and Commitment to Deadlines.',
+      contactInfo: 'Contact Information',
+      workingHours: 'Working Hours',
+      address: 'Riyadh, Al-Kharj Road, Second Industrial City',
+      allWeek: 'All Week',
+      hours24: '24 Hours',
+      footerCopyright: '© 2023 Al-Diyarna Modern Company. All rights reserved.',
+      rentSale: 'Rent / Sale',
+      fullServices: 'Integrated Services Within Your Budget',
+      fullServicesDesc: 'Whether you need equipment for a short period or want to own it, we have the solution.',
+      talkWithUs: 'Talk to us',
+    }
+  };
+
+  const t = translations[language];
+
+  const scissorLiftElectricImages = [
+    "https://tajeermodat.carrd.co/assets/images/image03.jpg?v=f5dc9cfb",
+    "https://tse2.mm.bing.net/th/id/OIP.PfW96oJpZWwtq_XY__S93gHaFj?pid=Api&h=220&P=0",
+    "https://tse3.mm.bing.net/th/id/OIP.G2tLladYG0cIN_QePKTSuQHaFj?pid=Api&h=220&P=0"
+  ];
+
+  const forkliftImages = [
+    "https://tajeermodat02.carrd.co/assets/images/image02.jpg?v=4610520a",
+    "https://tajeermodat02.carrd.co/assets/images/image06.jpg?v=4610520a",
+    "https://tajeermodat02.carrd.co/assets/images/image03.jpg?v=4610520a"
+  ];
+  // Image arrays for each equipment card (placeholders — you can replace later)
+  const manLiftImages = [
+    "https://www.mifflintownrental.com/wp-content/uploads/Articulating-Man-Lift-45-1.jpg",
+    "https://2.bp.blogspot.com/-cXnmJpsOG4Y/XmsjOp1allI/AAAAAAAACcU/OW4I7L3m06YG-eYOIb1OMBXURJBchKTgACK4BGAYYCw/s1600/Gallery-H800AJ-900x900.jpg",
+    "https://waterlooequipment.com/wp-content/uploads/jlg-450aj-manlift-1168x876.jpg"
+  ];
+
+  const craneImages = [
+    "https://proliftcrane.com/wp-content/uploads/all-terrain-crane.jpg",
+    "https://compliancehub.co.uk/wp-content/uploads/2022/09/mobile_cranes.jpg",
+    "https://image.made-in-china.com/2f0j00fVUkYeJMnScL/Used-5-Boom-Mobile-Crane-Xct25-25ton-Truck-Crane-Forsale.jpg"
+  ];
+
+  const wheelLoaderImages = [
+    "https://tajeermodat.com/wp-content/uploads/2024/10/%D8%B4%D9%8A%D9%88%D9%84-300x228.webp",
+    "https://up.yimg.com/ib/th/id/OIP.XWbQyc7m5fDJp_XwhwKJ3gHaFg?pid=Api&rs=1&c=1&qlt=95&w=149&h=111",
+    "https://up.yimg.com/ib/th/id/OIP.2f3sP855x9XPUXWqW3t8PwHaEO?pid=Api&rs=1&c=1&qlt=95&w=208&h=119"
+  ];
+
+  const backhoeLoaderImages = [
+    "https://tajeermodat.com/wp-content/uploads/2024/10/%D8%A8%D9%88%D9%83%D9%84%D9%8A%D9%86-300x228.webp",
+    "https://up.yimg.com/ib/th/id/OIP.VAGOQmM56GnFFqzSZ-309gHaE8?pid=Api&rs=1&c=1&qlt=95&w=172&h=115",
+    "https://up.yimg.com/ib/th/id/OIP.ufLjuGkXf0DvVs9cZqrFNgHaFE?pid=Api&rs=1&c=1&qlt=95&w=168&h=115"
+  ];
+
+
+
+  const compactorImages = [
+    "https://tse4.mm.bing.net/th/id/OIP.czRtTAd7X5q6ui11ye4cLwHaE6?pid=Api&h=220&P=0",
+    "https://tse2.mm.bing.net/th/id/OIP._7_BAivlUBzAk-E4gB5RYQHaFj?pid=Api&h=220&P=0",
+    "https://tse2.mm.bing.net/th/id/OIP.TJvsfXduS9NXa4vjJMVacwHaFS?pid=Api&h=220&P=0"
+  ];
+
+
+
+  const bobcatImages = [
+    "https://tajeermodat.com/wp-content/uploads/2024/10/gret4t5-300x228.png"
+  ];
+
+  const telehandlerImages = [
+    "https://tse2.mm.bing.net/th/id/OIP.jMjSDqF0yftIJIs29flm_wHaE8?pid=Api&h=220&P=0",
+    "https://tse2.mm.bing.net/th/id/OIP.uhuGP_CR79h02MZNyLhnpgHaFp?pid=Api&h=220&P=0",
+    "https://tse2.mm.bing.net/th/id/OIP.w7S6lSHyDkywfKgsnsxqBgHaDv?pid=Api&h=220&P=0"
+  ];
+
+  return (
+    <div className={`bg-background-light text-primary font-sans antialiased overflow-x-hidden relative ${language === 'ar' ? 'rtl' : 'ltr'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Top Navigation */}
+      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur shadow-sm border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Logo Area */}
+            <div className="flex items-center gap-3">
+              <div className="bg-accent p-2 rounded-lg text-primary">
+                <span className="material-symbols-outlined text-3xl">construction</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-primary leading-none">{t.companyName}</h1>
+                <p className="text-xs text-gray-500 font-medium mt-1">{t.tagline}</p>
+              </div>
+            </div>
+            {/* Desktop Nav */}
+            <nav className="hidden md:flex gap-8 items-center">
+              <a className="text-primary hover:text-accent font-semibold transition-colors" href="#">{t.home}</a>
+              <a className="text-gray-600 hover:text-primary font-medium transition-colors" href="#equipment">{t.equipment}</a>
+              <a className="text-gray-600 hover:text-primary font-medium transition-colors" href="#services">{t.services}</a>
+              <a className="text-gray-600 hover:text-primary font-medium transition-colors" href="#projects">{t.projects}</a>
+              <a className="text-gray-600 hover:text-primary font-medium transition-colors" href="#contact">{t.contact}</a>
+            </nav>
+            {/* CTA Button & Language Toggle */}
+            <div className="hidden md:flex gap-3 items-center">
+              <button
+                onClick={() => setLanguage(language === 'ar' ? 'en' : 'ar')}
+                className="bg-gray-100 hover:bg-gray-200 text-primary px-4 py-2.5 rounded-lg font-bold transition-all shadow-md text-sm"
+              >
+                {language === 'ar' ? 'EN' : 'عربي'}
+              </button>
+              <a className="bg-accent hover:bg-yellow-400 text-primary px-6 py-2.5 rounded-lg font-bold transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 flex items-center gap-2" href="https://wa.me/966536089153">
+                <span>{t.requestQuote}</span>
+                <span className="material-symbols-outlined text-sm">{language === 'ar' ? 'arrow_back' : 'arrow_forward'}</span>
+              </a>
+            </div>
+            {/* Mobile Menu Button */}
+            <button 
+              className="md:hidden text-primary p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <span className="material-symbols-outlined text-3xl">
+                {isMobileMenuOpen ? 'close' : 'menu'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white border-t border-gray-100 overflow-hidden"
+            >
+              <nav className="flex flex-col p-4 space-y-4">
+                <a 
+                  className="text-primary hover:text-accent font-semibold transition-colors px-4 py-2 rounded-lg hover:bg-gray-50" 
+                  href="#"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t.home}
+                </a>
+                <a 
+                  className="text-gray-600 hover:text-primary font-medium transition-colors px-4 py-2 rounded-lg hover:bg-gray-50" 
+                  href="#equipment"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t.equipment}
+                </a>
+                <a 
+                  className="text-gray-600 hover:text-primary font-medium transition-colors px-4 py-2 rounded-lg hover:bg-gray-50" 
+                  href="#services"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t.services}
+                </a>
+                <a 
+                  className="text-gray-600 hover:text-primary font-medium transition-colors px-4 py-2 rounded-lg hover:bg-gray-50" 
+                  href="#projects"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t.projects}
+                </a>
+                <a 
+                  className="text-gray-600 hover:text-primary font-medium transition-colors px-4 py-2 rounded-lg hover:bg-gray-50" 
+                  href="#contact"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {t.contact}
+                </a>
+                <button
+                  onClick={() => {
+                    setLanguage(language === 'ar' ? 'en' : 'ar');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="bg-gray-100 hover:bg-gray-200 text-primary px-6 py-3 rounded-lg font-bold transition-all shadow-md flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined">language</span>
+                  {language === 'ar' ? 'English' : 'العربية'}
+                </button>
+                <a 
+                  className="bg-accent hover:bg-yellow-400 text-primary px-6 py-3 rounded-lg font-bold transition-all shadow-md flex items-center justify-center gap-2 mt-4" 
+                  href="https://wa.me/966536089153"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <span>{t.requestQuote}</span>
+                  <span className="material-symbols-outlined text-sm">{language === 'ar' ? 'arrow_back' : 'arrow_forward'}</span>
+                </a>
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative bg-primary">
+        <div className="absolute inset-0 z-0">
+        <img 
+            alt="Industrial warehouse equipment scissor lift" 
+            className="w-full h-full object-cover opacity-20 mix-blend-overlay" 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSdP96xSgXNuYUe24SalLkHApC7ceS02Ipj50bZD-zddDMG2g6BNxae0oP1LRYYDEU1TvY59tfam7A9jwJQl7RlklXXRfzPY_UMll6yfvGZQ1LK8wo7nLyII8Omj5NWu_XLWXQxXA7XHd-dNkOyRn7b3JtU18Vfygd0g5B7JjiUsu5IeaotIwz9sdpC7viuz_1-LRs52ld4B4Ac4Wr-jOAe9q4vrlMZ2iiw77C8xz0aS_4kC-3No-GdSqJeR1JNY0Zr0xzBumllm2V"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent"></div>
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32 flex flex-col items-center text-center">
+          <span className="inline-block py-1 px-3 rounded-full bg-accent/20 text-accent border border-accent/30 text-sm font-bold mb-6">
+            {t.heroSubtag}
+          </span>
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-extrabold text-white leading-tight mb-6 max-w-4xl">
+            {t.heroTitle}
+          </h1>
+          <p className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto font-light">
+            {t.heroDescription}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <a className="flex items-center justify-center gap-2 bg-accent hover:bg-yellow-400 text-primary text-lg font-bold py-4 px-8 rounded-xl shadow-lg transition-all transform hover:scale-105 min-w-[200px]" href="https://wa.me/966536089153">
+              <span className="material-symbols-outlined">call</span>
+              {t.callNow}
+            </a>
+            <a className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/30 text-white text-lg font-bold py-4 px-8 rounded-xl shadow-lg transition-all min-w-[200px]" href="https://wa.me/966536089153">
+              <span className="material-symbols-outlined text-green-400">chat</span>
+              {t.whatsapp}
+            </a>
+          </div>
+          {/* Trust Indicators */}
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/10 pt-8 w-full max-w-4xl text-white/60">
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold text-white">{t.projects500}</span>
+              <span className="text-sm">{t.projects500Text}</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold text-white">{t.support24}</span>
+              <span className="text-sm">{t.supportText}</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold text-white">{t.guarantee100}</span>
+              <span className="text-sm">{t.guaranteeText}</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold text-white">{t.cities13}</span>
+              <span className="text-sm">{t.citiesText}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Fleet Section */}
+      <section className="py-20 bg-background-light" id="equipment">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+            <div>
+              <span className="text-accent font-bold text-sm tracking-wider uppercase">{t.ourFleet}</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-primary mt-2">{t.availableEquipment}</h2>
+            </div>
+            <a className="text-primary font-bold hover:text-accent flex items-center gap-2 transition-colors group" href="#">
+              {t.viewAll}
+              <span className="material-symbols-outlined transform group-hover:-translate-x-1 transition-transform">{language === 'ar' ? 'arrow_back' : 'arrow_forward'}</span>
+            </a>
+          </div>
+
+          {/* Equipment Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Product 1: Scissor Lift Electric */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={scissorLiftElectricImages} title={t.scissorLiftName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.scissorLiftName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.scissorLiftDesc}</p>
+                
+
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+          
+            {/* Product 3: Forklift */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={forkliftImages} title={t.forkliftName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.forkliftName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.forkliftDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+            {/* Additional products added per request */}
+            {/* Product 4: Man Lift */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={manLiftImages} title={t.manLiftName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.manLiftName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.manLiftDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+            {/* Product 5: Crane */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={craneImages} title={t.craneName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.craneName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.craneDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+            {/* Product 6: Wheel Loader */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={wheelLoaderImages} title={t.wheelLoaderName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.wheelLoaderName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.wheelLoaderDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+            {/* Product 7: Backhoe Loader */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={backhoeLoaderImages} title={t.backhoeLoaderName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.backhoeLoaderName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.backhoeLoaderDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+
+            {/* Product 9: Compactor */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={compactorImages} title={t.compactorName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.compactorName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.compactorDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+
+            {/* Product 11: Bobcat */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={bobcatImages} title={t.bobcatName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.bobcatName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.bobcatDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+            {/* Product 12: Telehandler Loader */}
+            <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all group flex flex-col">
+              <ImageGallery images={telehandlerImages} title={t.telehandlerName} badge={t.rentSale} />
+              <div className="p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold text-primary mb-2">{t.telehandlerName}</h3>
+                <p className="text-gray-500 text-sm mb-4">{t.telehandlerDesc}</p>
+                
+                <a href="https://wa.me/966536089153" className="block text-center w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-4 rounded-lg transition-colors mt-auto">
+                  {t.requestPrice}
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">{t.whyChooseUs}</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">{t.whyChooseDesc}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Card 1 */}
+            <div className="bg-background-light p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 group">
+              <div className="w-16 h-16 bg-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent transition-colors">
+                <span className="material-symbols-outlined text-4xl text-primary group-hover:text-primary">verified_user</span>
+              </div>
+              <h3 className="text-xl font-bold text-primary mb-3">{t.modernEquipment}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{t.modernDesc}</p>
+            </div>
+            {/* Card 2 */}
+            <div className="bg-background-light p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 group">
+              <div className="w-16 h-16 bg-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent transition-colors">
+                <span className="material-symbols-outlined text-4xl text-primary group-hover:text-primary">payments</span>
+              </div>
+              <h3 className="text-xl font-bold text-primary mb-3">{t.competitivePrices}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{t.pricesDesc}</p>
+            </div>
+            {/* Card 3 */}
+            <div className="bg-background-light p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 group">
+              <div className="w-16 h-16 bg-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent transition-colors">
+                <span className="material-symbols-outlined text-4xl text-primary group-hover:text-primary">local_shipping</span>
+              </div>
+              <h3 className="text-xl font-bold text-primary mb-3">{t.fastDelivery}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{t.deliveryDesc}</p>
+            </div>
+            {/* Card 4 */}
+            <div className="bg-background-light p-8 rounded-2xl shadow-sm hover:shadow-xl transition-shadow border border-gray-100 group">
+              <div className="w-16 h-16 bg-primary/5 rounded-xl flex items-center justify-center mb-6 group-hover:bg-accent transition-colors">
+                <span className="material-symbols-outlined text-4xl text-primary group-hover:text-primary">engineering</span>
+              </div>
+              <h3 className="text-xl font-bold text-primary mb-3">{t.technicalSupport}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{t.supportDesc}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Use Cases Grid */}
+      <section className="py-20 bg-background-light" id="projects">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">{t.useCases}</h2>
+                <p className="text-gray-600 text-lg">{t.useCasesDesc}</p>
+              </div>
+              <div className="space-y-6">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-accent">
+                    <span className="material-symbols-outlined">apartment</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-primary">{t.construction}</h4>
+                    <p className="text-gray-500 text-sm mt-1">{t.constructionDesc}</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-accent">
+                    <span className="material-symbols-outlined">inventory_2</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-primary">{t.warehouses}</h4>
+                    <p className="text-gray-500 text-sm mt-1">{t.warehousesDesc}</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center text-accent">
+                    <span className="material-symbols-outlined">factory</span>
+                  </div>
+                  <div>
+                    <h4 className="text-xl font-bold text-primary">{t.factories}</h4>
+                    <p className="text-gray-500 text-sm mt-1">{t.factoriesDesc}</p>
+                  </div>
+                </div>
+              </div>
+              <a className="inline-block bg-primary text-white font-bold py-3 px-8 rounded-lg hover:bg-primary/90 transition-colors shadow-lg" href="https://wa.me/966536089153">
+                {t.startProject}
+              </a>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <img 
+                alt="Construction site" 
+                className="rounded-2xl w-full h-48 md:h-64 object-cover shadow-lg transform translate-y-4" 
+                src="https://tajeermodat.com/wp-content/uploads/2024/11/heavy-machinery-used-coner5555.jpg"
+              />
+              <img 
+                alt="Warehouse logistics" 
+                className="rounded-2xl w-full h-48 md:h-64 object-cover shadow-lg" 
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOR0bPfhBw5pKGGHcnN4ipedU7aXCFxij2NzUWyDYUKF2GccSUasdQ_o9Aqmwa43DsJiMX6ZjzuJy-HeGJt65kFjTXTIWi0TSrAS2w1v5vlnz7PXRAG293DH8u-yGi1k3ApoXibbed21Qdk8en6MRpm5n-ch6S7KPMtdaniRqoJRnKSLoDDnrV6JOnATCr0cF9ZW9wIXwFJAnrh3DF2mZJSkcJtU8DwO3TENBGiMpkxXLImP0N7HsWxYMua6uVWZzXhoEbbvTvLzaE"
+              />
+              <img 
+                alt="Factory maintenance" 
+                className="rounded-2xl w-full h-48 md:h-64 object-cover shadow-lg transform translate-y-4" 
+                src="https://tajeermodat.com/wp-content/uploads/2024/11/heavy-machinery-used-conre.jpg"
+              />
+              <img 
+                alt="Event setup" 
+                className="rounded-2xl w-full h-48 md:h-64 object-cover shadow-lg" 
+                src="https://tajeermodat.com/wp-content/uploads/2024/11/heavy-machinery-used-coner5555.jpg"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing & Services Cards */}
+      <section className="py-20 bg-primary relative overflow-hidden" id="services">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(#ffcc00 1px, transparent 1px)', backgroundSize: '30px 30px'}}></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t.fullServices}</h2>
+            <p className="text-gray-300 max-w-2xl mx-auto">{t.fullServicesDesc}</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Rental Card */}
+            <div className="bg-white rounded-2xl p-8 flex flex-col shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
+              <div className="mb-6">
+                <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center text-primary mb-4">
+                  <span className="material-symbols-outlined text-2xl">calendar_month</span>
+                </div>
+                <h3 className="text-2xl font-bold text-primary">{t.rentalServices}</h3>
+                <p className="text-gray-500 mt-2">{t.rentalSubtitle}</p>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                <li className="flex items-center gap-3 text-gray-700">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.rentalBenefit1}</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.rentalBenefit2}</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.rentalBenefit3}</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.rentalBenefit4}</span>
+                </li>
+              </ul>
+              <a className="block w-full text-center bg-gray-100 hover:bg-gray-200 text-primary font-bold py-3 rounded-lg transition-colors" href="https://wa.me/966536089153">
+                {t.bookNow}
+              </a>
+            </div>
+            {/* Sales Card */}
+            <div className="bg-primary border border-white/20 rounded-2xl p-8 flex flex-col shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full -mr-8 -mt-8 transition-all group-hover:scale-110"></div>
+              <div className="mb-6">
+                <div className="w-12 h-12 bg-white/10 rounded-lg flex items-center justify-center text-white mb-4">
+                  <span className="material-symbols-outlined text-2xl">shopping_cart</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white">{t.salesServices}</h3>
+                <p className="text-gray-400 mt-2">{t.salesSubtitle}</p>
+              </div>
+              <ul className="space-y-4 mb-8 flex-1">
+                <li className="flex items-center gap-3 text-gray-300">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.salesBenefit1}</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.salesBenefit2}</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.salesBenefit3}</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-300">
+                  <span className="material-symbols-outlined text-accent">check_circle</span>
+                  <span>{t.salesBenefit4}</span>
+                </li>
+              </ul>
+              <a className="block w-full text-center bg-accent hover:bg-yellow-400 text-primary font-bold py-3 rounded-lg transition-colors" href="https://wa.me/966536089153">
+                {t.contactSales}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials & Coverage */}
+      <section className="py-20 bg-background-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Coverage Map Simulation */}
+          <div className="mb-20">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-primary">{t.coverage}</h2>
+            </div>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 flex flex-wrap justify-center gap-8 items-center">
+              <div className="flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-lg">
+                <span className="material-symbols-outlined text-accent">location_on</span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-primary">Riyadh</span>
+                  <span className="text-xs text-gray-500">{t.mainCenter}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-lg">
+                <span className="material-symbols-outlined text-accent">location_on</span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-primary">Jeddah</span>
+                  <span className="text-xs text-gray-500">{t.westBranch}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-lg">
+                <span className="material-symbols-outlined text-accent">location_on</span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-primary">Dammam</span>
+                  <span className="text-xs text-gray-500">{t.eastBranch}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 px-6 py-3 bg-gray-50 rounded-lg">
+                <span className="material-symbols-outlined text-gray-400">location_on</span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-gray-600">NEOM</span>
+                  <span className="text-xs text-gray-400">{t.comingSoon}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Testimonials */}
+          <h2 className="text-2xl font-bold text-primary mb-8 text-center">{t.testimonials}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <div className="flex gap-1 text-yellow-400 mb-4">
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+              </div>
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">{t.testimonial1}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">M</div>
+                <div>
+                  <h5 className="font-bold text-primary text-sm">{t.testimonialAuthor1}</h5>
+                  <p className="text-xs text-gray-400">{t.testimonialRole1}</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <div className="flex gap-1 text-yellow-400 mb-4">
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+              </div>
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">{t.testimonial2}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">A</div>
+                <div>
+                  <h5 className="font-bold text-primary text-sm">{t.testimonialAuthor2}</h5>
+                  <p className="text-xs text-gray-400">{t.testimonialRole2}</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+              <div className="flex gap-1 text-yellow-400 mb-4">
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+                <span className="material-symbols-outlined text-sm">star</span>
+              </div>
+              <p className="text-gray-600 text-sm mb-6 leading-relaxed">{t.testimonial3}</p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">F</div>
+                <div>
+                  <h5 className="font-bold text-primary text-sm">{t.testimonialAuthor3}</h5>
+                  <p className="text-xs text-gray-400">{t.testimonialRole3}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-primary text-white pt-16 pb-8 border-t-4 border-accent" id="contact">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            {/* Brand Info */}
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <span className="material-symbols-outlined text-accent text-3xl">construction</span>
+                <span className="text-2xl font-bold">{t.companyName}</span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                {t.footerDescription}
+              </p>
+            </div>
+            
+            {/* Contact Info */}
+            <div>
+              <h4 className="text-lg font-bold mb-6 text-white border-b border-accent/30 inline-block pb-2">{t.contactInfo}</h4>
+              <ul className="space-y-4 text-sm text-gray-400">
+                <li className="flex items-start gap-3">
+                  <span className="material-symbols-outlined text-accent shrink-0">location_on</span>
+                  <a href="https://maps.app.goo.gl/FXzTLcdmQYixRptE7" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-colors">
+                    {t.address}
+                  </a>
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-accent shrink-0">phone_iphone</span>
+                  <span dir="ltr">0536089153</span>
+                </li>
+              </ul>
+            </div>
+            {/* Working Hours */}
+            <div>
+              <h4 className="text-lg font-bold mb-6 text-white border-b border-accent/30 inline-block pb-2">{t.workingHours}</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li className="flex justify-between border-b border-white/5 pb-2">
+                  <span>{t.allWeek}</span>
+                  <span className="text-white">{t.hours24}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/10 pt-8 text-center text-gray-500 text-sm">
+            <p>{t.footerCopyright}</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Sticky Whatsapp Button */}
+      <a aria-label="Chat on WhatsApp" className="fixed bottom-6 left-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:bg-[#20bd5a] transition-all transform hover:scale-110 flex items-center justify-center group" href="https://wa.me/966536089153">
+        <svg className="w-8 h-8 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"></path></svg>
+        <span className="absolute right-full ml-4 bg-white text-gray-800 text-sm px-3 py-1 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap hidden md:block mr-4">
+            {t.talkWithUs}
+        </span>
+      </a>
+    </div>
+  );
+}
+
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        try {
+          root.render(<App />);
+        } catch (err) {
+          console.error(err);
+          document.body.innerHTML = `<pre class="p-8 text-red-600 bg-white">${err.toString()}</pre>`;
+        }
+    </script>
+</body>
+</html>
