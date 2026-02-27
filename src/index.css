@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1a2b48;
+  --color-accent: #ffcc00;
+  --color-background-light: #f8f9fc;
+  --color-background-dark: #101622;
+  
+  --font-sans: "Cairo", sans-serif;
+  --font-display: "Cairo", sans-serif;
+}
